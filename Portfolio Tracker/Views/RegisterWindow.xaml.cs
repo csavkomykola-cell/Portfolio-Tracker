@@ -33,7 +33,6 @@ namespace Portfolio_Tracker.Views
         private void Back_Click(object sender, RoutedEventArgs e)
         {
             var login = new LoginWindow();
-            login.Show();
             this.Close();
         }
 
