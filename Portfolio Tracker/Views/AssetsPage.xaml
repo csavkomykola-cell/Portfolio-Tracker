@@ -69,13 +69,14 @@
                 Background="Transparent"
                 BorderThickness="0"
                 CanUserAddRows="False"
+                CanUserDeleteRows="True"
                 CanUserSortColumns="False"
                 FontSize="15"
                 Foreground="{DynamicResource TableTextColor}"
                 IsReadOnly="False"
                 ItemsSource="{Binding Assets}"
                 RowEditEnding="AssetsGrid_RowEditEnding"
-                SelectedItem="{Binding SelectedAsset}">
+                SelectedItem="{Binding SelectedAsset, Mode=TwoWay}">
 
                 <DataGrid.RowStyle>
                     <Style TargetType="DataGridRow">
@@ -92,21 +93,30 @@
 
                 <DataGrid.Columns>
                     <DataGridTextColumn
-                        Width="*"
-                        Binding="{Binding Symbol}"
+                        Width="60"
+                        Binding="{Binding Symbol, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                         Header="{DynamicResource Symbol}" />
                     <DataGridTextColumn
                         Width="2*"
-                        Binding="{Binding Name}"
+                        Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                         Header="{DynamicResource Name}" />
                     <DataGridTextColumn
                         Width="*"
-                        Binding="{Binding AssetType}"
+                        Binding="{Binding AssetType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         Header="{DynamicResource AssetType}" />
                     <DataGridTextColumn
-                        Width="*"
-                        Binding="{Binding Currency}"
+                        Width="80"
+                        Binding="{Binding Currency, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                         Header="{DynamicResource Currency}" />
+                    <DataGridTextColumn
+                        Width="100"
+                        Binding="{Binding CurrentPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}"
+                        Header="{DynamicResource CurrentPrice}" />
+                    <DataGridTextColumn
+                        Width="140"
+                        Binding="{Binding LastUpdated, Mode=OneWay, StringFormat=dd.MM.yyyy HH:mm}"
+                        Header="{DynamicResource LastUpdated}"
+                        IsReadOnly="True" />
                 </DataGrid.Columns>
 
             </DataGrid>

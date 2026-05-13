@@ -2,65 +2,168 @@
     x:Class="Portfolio_Tracker.Views.AddTransactionWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="Додати транзакцію"
-    Width="350"
-    Height="470"
+    Title="{DynamicResource NewTransaction}"
+    Width="420"
+    Height="520"
     Background="{DynamicResource MainBackground}"
     Loaded="Page_Loaded"
     Opacity="0"
+    ResizeMode="NoResize"
     WindowStartupLocation="CenterScreen">
 
-    <StackPanel Margin="20">
+    <Border
+        Margin="12"
+        Padding="12"
+        Background="{DynamicResource CardBackground}"
+        BorderBrush="#2E2E4F"
+        BorderThickness="1"
+        CornerRadius="10">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <TextBlock
-            Margin="0,0,0,15"
-            FontSize="18"
-            FontWeight="Bold"
-            Foreground="{DynamicResource TextColor}"
-            Text="{DynamicResource NewTransaction}" />
+            <TextBlock
+                Margin="6"
+                FontSize="18"
+                FontWeight="Bold"
+                Foreground="{DynamicResource TextColor}"
+                Text="{DynamicResource NewTransaction}" />
 
-        <TextBlock
-            FontSize="15"
-            Foreground="{DynamicResource TextColor}"
-            Text="{DynamicResource Type}" />
-        <ComboBox x:Name="TypeCombo" Margin="0,5,0,10">
-            <ComboBoxItem Content="Купівля" />
-            <ComboBoxItem Content="Продаж" />
-            <ComboBoxItem Content="Дивіденд" />
-        </ComboBox>
+            <ScrollViewer
+                Grid.Row="1"
+                Margin="6"
+                VerticalScrollBarVisibility="Auto">
+                <StackPanel>
 
-        <TextBlock
-            FontSize="15"
-            Foreground="{DynamicResource TextColor}"
-            Text="{DynamicResource Asset}" />
-        <TextBox x:Name="AssetText" Margin="0,5,0,10" FontSize="15" />
+                    <TextBlock
+                        FontSize="14"
+                        Foreground="{DynamicResource TextColor}"
+                        Text="{DynamicResource Type}" />
+                    <ComboBox
+                        x:Name="TypeCombo"
+                        Margin="0,6,0,10"
+                        SelectedValuePath="Content">
+                        <ComboBoxItem Content="Buy" />
+                        <ComboBoxItem Content="Sell" />
+                        <ComboBoxItem Content="Dividend" />
+                    </ComboBox>
 
-        <TextBlock
-            FontSize="15"
-            Foreground="{DynamicResource TextColor}"
-            Text="{DynamicResource Quantity}" />
-        <TextBox x:Name="QuantityText" Margin="0,5,0,10" FontSize="15" />
+                    <TextBlock
+                        FontSize="14"
+                        Foreground="{DynamicResource TextColor}"
+                        Text="{DynamicResource Asset}" />
+                    <TextBox
+                        x:Name="AssetText"
+                        Margin="0,6,0,10"
+                        FontSize="14" />
 
-        <TextBlock
-            FontSize="15"
-            Foreground="{DynamicResource TextColor}"
-            Text="{DynamicResource Price}" />
-        <TextBox x:Name="PriceText" Margin="0,5,0,10" FontSize="15" />
+                    <TextBlock
+                        FontSize="14"
+                        Foreground="{DynamicResource TextColor}"
+                        Text="{DynamicResource Quantity}" />
+                    <TextBox
+                        x:Name="QuantityText"
+                        Margin="0,6,0,10"
+                        FontSize="14" />
 
-        <TextBlock
-            FontSize="15"
-            Foreground="{DynamicResource TextColor}"
-            Text="{DynamicResource Date}" />
-        <DatePicker x:Name="DatePicker" Margin="0,5,0,10" FontSize="15" />
+                    <TextBlock
+                        FontSize="14"
+                        Foreground="{DynamicResource TextColor}"
+                        Text="{DynamicResource Price}" />
+                    <TextBox
+                        x:Name="PriceText"
+                        Margin="0,6,0,10"
+                        FontSize="14" />
 
-        <Button
-            Margin="0,15,0,0"
-            Padding="10"
-            Background="{DynamicResource CardBackground}"
-            Click="Save_Click"
-            Content="{DynamicResource Save}"
-            FontSize="15"
-            Foreground="{DynamicResource TextColor}" />
+                    <TextBlock
+                        FontSize="14"
+                        Foreground="{DynamicResource TextColor}"
+                        Text="{DynamicResource Fees}" />
+                    <TextBox
+                        x:Name="FeesText"
+                        Margin="0,6,0,10"
+                        FontSize="14" />
 
-    </StackPanel>
+                    <TextBlock
+                        FontSize="14"
+                        Foreground="{DynamicResource TextColor}"
+                        Text="{DynamicResource Date}" />
+                    <DatePicker
+                        x:Name="DatePicker"
+                        Margin="0,6,0,10"
+                        FontSize="14" />
+
+                    <TextBlock
+                        FontSize="14"
+                        Foreground="{DynamicResource TextColor}"
+                        Text="{DynamicResource Notes}" />
+                    <TextBox
+                        x:Name="NotesText"
+                        Height="80"
+                        Margin="0,6,0,10"
+                        AcceptsReturn="True"
+                        FontSize="14"
+                        TextWrapping="Wrap" />
+
+                    <StackPanel
+                        Margin="0,6,0,0"
+                        HorizontalAlignment="Left"
+                        Orientation="Horizontal">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontSize="14"
+                            Foreground="{DynamicResource TextColor}"
+                            Text="{DynamicResource TotalAmount}" />
+                        <TextBlock
+                            x:Name="TotalAmountText"
+                            Margin="8,0,0,0"
+                            VerticalAlignment="Center"
+                            FontSize="14"
+                            FontWeight="Bold"
+                            Foreground="{DynamicResource TextColor}" />
+                    </StackPanel>
+
+                </StackPanel>
+            </ScrollViewer>
+
+            <StackPanel
+                Grid.Row="2"
+                Margin="6"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal">
+                <Button
+                    x:Name="CancelButton"
+                    Width="90"
+                    Margin="6"
+                    Padding="8"
+                    Background="Transparent"
+                    Click="Cancel_Click"
+                    Content="{DynamicResource Cancel}"
+                    Foreground="{DynamicResource TextColor}" />
+                <Button
+                    x:Name="SaveButton"
+                    Width="120"
+                    Margin="6"
+                    Padding="8"
+                    Background="{DynamicResource ButtonPrimaryBackground}"
+                    Click="Save_Click"
+                    Content="{DynamicResource Save}"
+                    Foreground="{DynamicResource ButtonPrimaryForeground}">
+                    <Button.Style>
+                        <Style BasedOn="{StaticResource {x:Type Button}}" TargetType="Button">
+                            <Setter Property="Cursor" Value="Hand" />
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Opacity" Value="0.95" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Border>
 </Window>

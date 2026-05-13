@@ -1,78 +1,45 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+﻿using Portfolio_Tracker.Models;
 using System;
 using System.Globalization;
-using Portfolio_Tracker.Models;
+using System.Windows;
+using System.Windows.Media.Animation;
 
 namespace Portfolio_Tracker.Views
 {
-    /// <summary>
-    /// Interaction logic for AddTransactionWindow.xaml
-    /// </summary>
     public partial class AddTransactionWindow : Window
     {
+        public Transaction Transaction { get; private set; }
+
         public AddTransactionWindow()
         {
             InitializeComponent();
+            Transaction = new Transaction();
+            DatePicker.SelectedDate = Transaction.Date;
+            UpdateTotal();
         }
 
-        private void Save_Click(object sender, RoutedEventArgs e)
+        public AddTransactionWindow(Transaction existing) : this()
         {
-            // Прочитує та перевіряє введені дані
-            var typeItem = TypeCombo.SelectedItem as ComboBoxItem;
-            string type = typeItem?.Content?.ToString() ?? string.Empty;
-            string asset = AssetText.Text?.Trim() ?? string.Empty;
-
-            if (string.IsNullOrWhiteSpace(type) || string.IsNullOrWhiteSpace(asset))
+            if (existing != null)
             {
-                MessageBox.Show("Заповніть тип та актив.", "Помилка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
+                Transaction = existing;
+                AssetText.Text = Transaction.Asset;
+                QuantityText.Text = Transaction.Quantity.ToString(CultureInfo.InvariantCulture);
+                PriceText.Text = Transaction.Price.ToString(CultureInfo.InvariantCulture);
+                FeesText.Text = Transaction.Fees.ToString(CultureInfo.InvariantCulture);
+                NotesText.Text = Transaction.Notes;
+                DatePicker.SelectedDate = Transaction.Date;
+                // Встановити значення TypeCombo
+                foreach (var item in TypeCombo.Items)
+                {
+                    if (item is System.Windows.Controls.ComboBoxItem c && (string)c.Content == Transaction.Type)
+                    {
+                        TypeCombo.SelectedItem = item;
+                        break;
+                    }
+                }
+                UpdateTotal();
             }
-
-            if (!double.TryParse(QuantityText.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out double quantity))
-            {
-                MessageBox.Show("Невірна кількість.", "Помилка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (!decimal.TryParse(PriceText.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal price))
-            {
-                MessageBox.Show("Невірна ціна.", "Помилка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            string dateStr;
-            if (DatePicker.SelectedDate.HasValue)
-            {
-                dateStr = DatePicker.SelectedDate.Value.ToString("dd.MM.yyyy");
-            }
-            else
-            {
-                dateStr = DateTime.Now.ToString("dd.MM.yyyy");
-            }
-
-            Transaction = new Transaction
-            {
-                Type = type,
-                Asset = asset,
-                Quantity = quantity,
-                Price = price,
-                Date = dateStr
-            };
-
-            DialogResult = true;
-            Close();
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -81,12 +48,75 @@ namespace Portfolio_Tracker.Views
             {
                 From = 0,
                 To = 1,
-                Duration = TimeSpan.FromSeconds(0.2)
+                Duration = TimeSpan.FromSeconds(0.18)
             };
 
             this.BeginAnimation(OpacityProperty, animation);
+
+            // Підключити обробники подій зміни (change handlers)
+            QuantityText.TextChanged += (_, __) => UpdateTotal();
+            PriceText.TextChanged += (_, __) => UpdateTotal();
+            FeesText.TextChanged += (_, __) => UpdateTotal();
         }
 
-        public Transaction Transaction { get; set; }
+        private void UpdateTotal()
+        {
+            if (!double.TryParse(QuantityText?.Text ?? "0", NumberStyles.Any, CultureInfo.InvariantCulture, out double qty))
+                qty = 0;
+            if (!decimal.TryParse(PriceText?.Text ?? "0", NumberStyles.Any, CultureInfo.InvariantCulture, out decimal price))
+                price = 0;
+            if (!decimal.TryParse(FeesText?.Text ?? "0", NumberStyles.Any, CultureInfo.InvariantCulture, out decimal fees))
+                fees = 0;
+
+            var total = (decimal)qty * price + fees;
+            TotalAmountText.Text = total.ToString("N2", CultureInfo.InvariantCulture);
+        }
+
+        private void Save_Click(object sender, RoutedEventArgs e)
+        {
+            // Прочитати значення та виконати валідацію
+            var typeItem = TypeCombo.SelectedItem as System.Windows.Controls.ComboBoxItem;
+            Transaction.Type = typeItem?.Content?.ToString() ?? "Buy";
+            Transaction.Asset = AssetText.Text?.Trim() ?? string.Empty;
+
+            if (!double.TryParse(QuantityText.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out double quantity))
+            {
+                MessageBox.Show((string)TryFindResource("InvalidQuantity") ?? "Invalid quantity.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            Transaction.Quantity = quantity;
+
+            if (!decimal.TryParse(PriceText.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal price))
+            {
+                MessageBox.Show((string)TryFindResource("InvalidPrice") ?? "Invalid price.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            Transaction.Price = price;
+
+            if (!decimal.TryParse(FeesText.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal fees))
+            {
+                MessageBox.Show((string)TryFindResource("InvalidFees") ?? "Invalid fees.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            Transaction.Fees = fees;
+
+            Transaction.Notes = NotesText.Text ?? string.Empty;
+            Transaction.Date = DatePicker.SelectedDate ?? DateTime.Now;
+
+            if (!Transaction.Validate(out string msg))
+            {
+                MessageBox.Show(msg, (string)TryFindResource("ValidationError") ?? "Validation error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            DialogResult = true;
+            Close();
+        }
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = false;
+            Close();
+        }
     }
 }

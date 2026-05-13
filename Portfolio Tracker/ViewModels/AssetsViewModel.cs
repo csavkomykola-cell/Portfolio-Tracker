@@ -1,5 +1,6 @@
 ﻿using Portfolio_Tracker.Models;
 using Portfolio_Tracker.Services;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -21,15 +22,25 @@ namespace Portfolio_Tracker.ViewModels
             }
         }
 
+        private const string AssetsPath = "Data/assets.json";
+
         public AssetsViewModel()
         {
-            // Завантаження з JSON
-            var loadedAssets =
-                JsonService.Load<ObservableCollection<Asset>>("Data/assets.json");
+            // Завантаження з JSON за допомогою централізованого сервісу JsonService
+            var loadedAssets = JsonService.LoadAssets<ObservableCollection<Asset>>();
 
             Assets = loadedAssets ?? new ObservableCollection<Asset>();
 
-            // Якщо файл пустий - додаються стартові дані
+            // Переконатися, що існуючі активи мають встановлені Ids та LastUpdated
+            foreach (var a in Assets)
+            {
+                if (a.Id == Guid.Empty)
+                    a.Id = Guid.NewGuid();
+                if (a.LastUpdated == default)
+                    a.LastUpdated = DateTime.UtcNow;
+            }
+
+            // Якщо файл порожній — додати початкові дані
             if (Assets.Count == 0)
             {
                 Assets.Add(new Asset
@@ -37,7 +48,8 @@ namespace Portfolio_Tracker.ViewModels
                     Symbol = "AAPL",
                     Name = "Apple",
                     AssetType = "Акція",
-                    Currency = "USD"
+                    Currency = "USD",
+                    CurrentPrice = 0
                 });
 
                 Assets.Add(new Asset
@@ -45,7 +57,8 @@ namespace Portfolio_Tracker.ViewModels
                     Symbol = "BTC",
                     Name = "Bitcoin",
                     AssetType = "Криптовалюта",
-                    Currency = "USD"
+                    Currency = "USD",
+                    CurrentPrice = 0
                 });
 
                 Assets.Add(new Asset
@@ -53,20 +66,38 @@ namespace Portfolio_Tracker.ViewModels
                     Symbol = "TSLA",
                     Name = "Tesla",
                     AssetType = "Акція",
-                    Currency = "USD"
+                    Currency = "USD",
+                    CurrentPrice = 0
                 });
 
                 SaveAssets();
             }
         }
+
         public void SaveAssets()
         {
+            // Перевірити (валідувати) та зберегти лише коректні активи
             var validAssets = Assets
+                .Where(a => a != null)
                 .Where(a =>
                     !string.IsNullOrWhiteSpace(a.Symbol) &&
-                    !string.IsNullOrWhiteSpace(a.Name))
+                    !string.IsNullOrWhiteSpace(a.Name) &&
+                    !string.IsNullOrWhiteSpace(a.Currency))
                 .ToList();
-            Services.JsonService.Save("Data/assets.json", validAssets);
+
+            JsonService.SaveAssets(validAssets);
+        }
+
+        public bool ValidateAsset(Asset asset, out string message)
+        {
+            if (asset == null)
+            {
+                message = "Asset is null.";
+                return false;
+            }
+
+            var ok = asset.Validate(out message);
+            return ok;
         }
 
         public void OnPropertyChanged(string name)

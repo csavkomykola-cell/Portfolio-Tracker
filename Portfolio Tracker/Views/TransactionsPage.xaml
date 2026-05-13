@@ -21,15 +21,39 @@
             Foreground="{DynamicResource TextColor}"
             Text="{DynamicResource Transactions}" />
 
-        <Button
+        <StackPanel
             Grid.Row="1"
             Margin="0,0,0,15"
-            Padding="10"
-            Background="{DynamicResource CardBackground}"
-            Click="AddTransaction_Click"
-            Content="{DynamicResource AddTransaction}"
-            FontSize="15"
-            Foreground="{DynamicResource TextColor}" />
+            Orientation="Horizontal">
+
+            <Button
+                Margin="5"
+                Padding="8"
+                Background="{DynamicResource ButtonPrimaryBackground}"
+                Click="AddTransaction_Click"
+                Content="{DynamicResource AddTransaction}"
+                FontSize="15"
+                Foreground="{DynamicResource ButtonPrimaryForeground}" />
+
+            <Button
+                Margin="5"
+                Padding="8"
+                Background="{DynamicResource ButtonPrimaryBackground}"
+                Click="EditTransaction_Click"
+                Content="{DynamicResource Edit}"
+                FontSize="15"
+                Foreground="{DynamicResource ButtonPrimaryForeground}" />
+
+            <Button
+                Margin="5"
+                Padding="8"
+                Background="{DynamicResource ButtonDangerBackground}"
+                Click="DeleteTransaction_Click"
+                Content="{DynamicResource Delete}"
+                FontSize="15"
+                Foreground="{DynamicResource ButtonDangerForeground}" />
+
+        </StackPanel>
 
         <Border
             Grid.Row="2"
@@ -40,50 +64,54 @@
             CornerRadius="8">
 
             <DataGrid
+                x:Name="TransactionsGrid"
+                Margin="0"
                 AutoGenerateColumns="False"
                 Background="Transparent"
                 BorderThickness="0"
+                CanUserDeleteRows="True"
                 CanUserSortColumns="False"
-                FontSize="15"
+                FontSize="14"
                 Foreground="{DynamicResource TableTextColor}"
                 IsReadOnly="False"
-                ItemsSource="{Binding Transactions}">
-                <DataGrid.RowStyle>
-                    <Style TargetType="DataGridRow">
-                        <Setter Property="Foreground" Value="{DynamicResource TableTextColor}" />
-                    </Style>
-                </DataGrid.RowStyle>
-
-                <DataGrid.CellStyle>
-                    <Style TargetType="DataGridCell">
-                        <Setter Property="Foreground" Value="{DynamicResource TableTextColor}" />
-                        <Setter Property="BorderThickness" Value="0" />
-                    </Style>
-                </DataGrid.CellStyle>
-
+                ItemsSource="{Binding Transactions}"
+                RowEditEnding="TransactionsGrid_RowEditEnding"
+                SelectedItem="{Binding SelectedTransaction, Mode=TwoWay}">
                 <DataGrid.Columns>
                     <DataGridTextColumn
-                        Width="*"
-                        Binding="{Binding Type}"
+                        Width="80"
+                        Binding="{Binding Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         Header="{DynamicResource Type}" />
                     <DataGridTextColumn
-                        Width="*"
-                        Binding="{Binding Asset}"
+                        Width="120"
+                        Binding="{Binding Asset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                         Header="{DynamicResource Asset}" />
                     <DataGridTextColumn
-                        Width="*"
-                        Binding="{Binding Quantity}"
+                        Width="90"
+                        Binding="{Binding Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}"
                         Header="{DynamicResource Quantity}" />
                     <DataGridTextColumn
-                        Width="*"
-                        Binding="{Binding Price}"
+                        Width="90"
+                        Binding="{Binding Price, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}"
                         Header="{DynamicResource Price}" />
                     <DataGridTextColumn
-                        Width="*"
-                        Binding="{Binding Date}"
+                        Width="90"
+                        Binding="{Binding Fees, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}"
+                        Header="{DynamicResource Fees}" />
+                    <DataGridTextColumn
+                        Width="100"
+                        Binding="{Binding TotalAmount, Mode=OneWay, StringFormat=N2}"
+                        Header="{DynamicResource TotalAmount}"
+                        IsReadOnly="True" />
+                    <DataGridTextColumn
+                        Width="120"
+                        Binding="{Binding Date, Mode=TwoWay, StringFormat=dd.MM.yyyy}"
                         Header="{DynamicResource Date}" />
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding Notes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        Header="{DynamicResource Notes}" />
                 </DataGrid.Columns>
-
             </DataGrid>
 
         </Border>

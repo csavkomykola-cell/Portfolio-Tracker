@@ -8,7 +8,7 @@
     <sys:String x:Key="Transactions">Транзакції</sys:String>
     <sys:String x:Key="Assets">Активи</sys:String>
     <sys:String x:Key="Settings">Налаштування</sys:String>
-    <sys:String x:Key="AddTransaction">Додати актив</sys:String>
+    <sys:String x:Key="AddTransaction">Додати транзакцію</sys:String>
     <sys:String x:Key="Save">Зберегти</sys:String>
     <sys:String x:Key="Theme">Тема</sys:String>
     <sys:String x:Key="Language">Мова</sys:String>
@@ -40,5 +40,16 @@
     <sys:String x:Key="Registration">Реєстрація</sys:String>
     <sys:String x:Key="FullName">ПІБ</sys:String>
     <sys:String x:Key="Back">Назад</sys:String>
+    <sys:String x:Key="TotalAmount">Загальна сума</sys:String>
+    <sys:String x:Key="Notes">Примітки</sys:String>
+    <sys:String x:Key="Fees">Комісія</sys:String>
+    <sys:String x:Key="Cancel">Скасувати</sys:String>
+    <sys:String x:Key="InvalidQuantity">Невірна кількість.</sys:String>
+    <sys:String x:Key="InvalidPrice">Невірна ціна.</sys:String>
+    <sys:String x:Key="InvalidFees">Невірна комісія.</sys:String>
+    <sys:String x:Key="ValidationError">Помилка валідації</sys:String>
+    <sys:String x:Key="SelectTransaction">Оберіть транзакцію</sys:String>
+    <sys:String x:Key="ConfirmDelete">Видалити транзакцію?</sys:String>
+    <sys:String x:Key="Confirmation">Підтвердження</sys:String>
 
 </ResourceDictionary>

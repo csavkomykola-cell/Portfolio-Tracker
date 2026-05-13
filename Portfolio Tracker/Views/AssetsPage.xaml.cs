@@ -1,19 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Threading;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Animation;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Portfolio_Tracker.Models;
 using Portfolio_Tracker.ViewModels;
 
@@ -34,14 +23,19 @@ namespace Portfolio_Tracker.Views
 
         private void Add_Click(object sender, RoutedEventArgs e)
         {
-            vm.Assets.Add(new Asset
+            // Використати діалогове вікно для створення нового активу (валідація всередині діалогу)
+            var newAsset = new Asset();
+            var window = new EditAssetWindow(newAsset);
+
+            if (window.ShowDialog() == true)
             {
-                Symbol = "",
-                Name = "",
-                AssetType = "",
-                Currency = ""
-            });
-            vm.SaveAssets();
+                // Переконатися, що Id встановлено
+                if (newAsset.Id == Guid.Empty)
+                    newAsset.Id = Guid.NewGuid();
+
+                vm.Assets.Add(newAsset);
+                vm.SaveAssets();
+            }
         }
 
         private void Edit_Click(object sender, RoutedEventArgs e)
@@ -65,8 +59,11 @@ namespace Portfolio_Tracker.Views
         {
             if (vm.SelectedAsset != null)
             {
-                vm.Assets.Remove(vm.SelectedAsset);
-                vm.SaveAssets();
+                if (MessageBox.Show("Видалити актив?", "Підтвердження", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    vm.Assets.Remove(vm.SelectedAsset);
+                    vm.SaveAssets();
+                }
             }
             else
             {
@@ -87,9 +84,20 @@ namespace Portfolio_Tracker.Views
 
         private void AssetsGrid_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
         {
+            // Дозволити DataGrid спочатку зафіксувати зміни (commit), а потім перевірити та зберегти
             Dispatcher.BeginInvoke(new Action(() =>
             {
-                vm.SaveAssets();
+                if (e.Row?.Item is Asset asset)
+                {
+                    if (vm.ValidateAsset(asset, out string message))
+                    {
+                        vm.SaveAssets();
+                    }
+                    else
+                    {
+                        MessageBox.Show(message, "Validation error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                }
             }), System.Windows.Threading.DispatcherPriority.Background);
         }
     }

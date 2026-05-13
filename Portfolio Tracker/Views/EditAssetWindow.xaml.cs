@@ -1,17 +1,6 @@
 ﻿using Portfolio_Tracker.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using System.Windows.Media.Animation;
 
 namespace Portfolio_Tracker.Views
@@ -23,12 +12,18 @@ namespace Portfolio_Tracker.Views
         public EditAssetWindow(Asset asset)
         {
             InitializeComponent();
-            Asset = asset;
+            Asset = asset ?? new Asset();
             DataContext = Asset;
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
+            if (!Asset.Validate(out string message))
+            {
+                MessageBox.Show(message, "Validation error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             DialogResult = true;
             Close();
         }
