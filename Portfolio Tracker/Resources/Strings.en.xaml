@@ -40,5 +40,16 @@
     <sys:String x:Key="Registration">Registration</sys:String>
     <sys:String x:Key="FullName">Full Name</sys:String>
     <sys:String x:Key="Back">Back</sys:String>
+    <sys:String x:Key="TotalAmount">TotalAmount</sys:String>
+    <sys:String x:Key="Notes">Notes</sys:String>
+    <sys:String x:Key="Fees">Fees</sys:String>
+    <sys:String x:Key="Cancel">Cancel</sys:String>
+    <sys:String x:Key="InvalidQuantity">Invalid Quantity.</sys:String>
+    <sys:String x:Key="InvalidPrice">Invalid Price.</sys:String>
+    <sys:String x:Key="InvalidFees">Invalid Fees.</sys:String>
+    <sys:String x:Key="ValidationError">Validation Error</sys:String>
+    <sys:String x:Key="SelectTransaction">Select a Transaction</sys:String>
+    <sys:String x:Key="ConfirmDelete">Delete Transaction?</sys:String>
+    <sys:String x:Key="Confirmation">Confirmation</sys:String>
 
 </ResourceDictionary>
