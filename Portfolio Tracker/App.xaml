@@ -2,7 +2,6 @@
     x:Class="Portfolio_Tracker.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:Portfolio_Tracker"
     StartupUri="Views/LoginWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
@@ -11,84 +10,207 @@
                 <ResourceDictionary Source="/Portfolio Tracker;component/Resources/Strings.uk.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <!--  Кольори  -->
             <SolidColorBrush x:Key="MainBackground" Color="#12121A" />
             <SolidColorBrush x:Key="CardBackground" Color="#1E1E2F" />
             <SolidColorBrush x:Key="TextColor" Color="White" />
             <SolidColorBrush x:Key="TableTextColor" Color="Black" />
-            <SolidColorBrush x:Key="BlackColor" Color="Black" />
             <SolidColorBrush x:Key="SidebarHoverBackground" Color="#2E2E4F" />
             <SolidColorBrush x:Key="ButtonPrimaryBackground" Color="White" />
             <SolidColorBrush x:Key="ButtonPrimaryForeground" Color="Black" />
             <SolidColorBrush x:Key="ButtonDangerBackground" Color="#FF4C4C" />
             <SolidColorBrush x:Key="ButtonDangerForeground" Color="White" />
 
-            <Style x:Key="SidebarButton" TargetType="Button">
-                <Setter Property="Background" Value="#00FFFFFF" />
-                <Setter Property="Foreground" Value="{DynamicResource TextColor}" />
-                <Setter Property="Margin" Value="5" />
-                <Setter Property="Padding" Value="10" />
-                <Setter Property="HorizontalContentAlignment" Value="Left" />
-                <Setter Property="BorderBrush" Value="Transparent" />
-
-                <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
-                <Setter Property="RenderTransform">
+            <!--  Стиль картки (закруглена, тінь)  -->
+            <Style x:Key="CardStyle" TargetType="Border">
+                <Setter Property="Background" Value="{DynamicResource CardBackground}" />
+                <Setter Property="CornerRadius" Value="10" />
+                <Setter Property="Padding" Value="12" />
+                <Setter Property="BorderBrush" Value="#2E2E4F" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Effect">
                     <Setter.Value>
-                        <ScaleTransform ScaleX="1" ScaleY="1" />
+                        <DropShadowEffect
+                            BlurRadius="10"
+                            Opacity="0.25"
+                            ShadowDepth="2"
+                            Color="#000000" />
                     </Setter.Value>
                 </Setter>
+            </Style>
 
+            <!--  Стиль кнопки з анімацією при наведенні  -->
+            <Style x:Key="AccentButton" TargetType="Button">
+                <Setter Property="Background" Value="{DynamicResource ButtonPrimaryBackground}" />
+                <Setter Property="Foreground" Value="{DynamicResource ButtonPrimaryForeground}" />
+                <Setter Property="Padding" Value="8" />
+                <Setter Property="Cursor" Value="Hand" />
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
                             <Border
-                                x:Name="border"
+                                x:Name="bd"
                                 Background="{TemplateBinding Background}"
-                                CornerRadius="5">
-
-                                <ContentPresenter Margin="5" />
+                                CornerRadius="6">
+                                <ContentPresenter
+                                    Margin="{TemplateBinding Padding}"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center" />
                             </Border>
-
                             <ControlTemplate.Triggers>
-
                                 <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="border" Property="Background" Value="{DynamicResource SidebarHoverBackground}" />
-
-                                    <Setter Property="RenderTransform">
-                                        <Setter.Value>
-                                            <ScaleTransform ScaleX="1.05" ScaleY="1.05" />
-                                        </Setter.Value>
-                                    </Setter>
+                                    <Trigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation
+                                                    Storyboard.TargetName="bd"
+                                                    Storyboard.TargetProperty="Opacity"
+                                                    To="0.95"
+                                                    Duration="0:0:0.12" />
+                                                <ThicknessAnimation
+                                                    Storyboard.TargetName="bd"
+                                                    Storyboard.TargetProperty="Margin"
+                                                    To="0,0,0,0"
+                                                    Duration="0:0:0.12" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </Trigger.EnterActions>
                                 </Trigger>
-
                                 <Trigger Property="IsPressed" Value="True">
-                                    <Setter Property="RenderTransform">
+                                    <Setter TargetName="bd" Property="RenderTransform">
                                         <Setter.Value>
-                                            <ScaleTransform ScaleX="0.95" ScaleY="0.95" />
+                                            <ScaleTransform ScaleX="0.98" ScaleY="0.98" />
                                         </Setter.Value>
                                     </Setter>
                                 </Trigger>
-
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
             </Style>
 
+            <!--  Стиль кнопки-перемикача бічної панелі (активне виділення + наведення)  -->
+            <Style x:Key="SidebarToggleButtonStyle" TargetType="ToggleButton">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Foreground" Value="{DynamicResource TextColor}" />
+                <Setter Property="Padding" Value="8" />
+                <Setter Property="FontSize" Value="20" />
+                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ToggleButton">
+                            <Border
+                                x:Name="root"
+                                Padding="{TemplateBinding Padding}"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="6">
+                                <Grid>
+                                    <Rectangle
+                                        x:Name="indicator"
+                                        Width="6"
+                                        Height="40"
+                                        Margin="-6,0,0,0"
+                                        HorizontalAlignment="Left"
+                                        Fill="Transparent"
+                                        RadiusX="3"
+                                        RadiusY="3" />
+                                    <ContentPresenter Margin="12,0,0,0" VerticalAlignment="Center" />
+                                </Grid>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="root" Property="Background" Value="{DynamicResource SidebarHoverBackground}" />
+                                </Trigger>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter TargetName="root" Property="Background" Value="{DynamicResource SidebarHoverBackground}" />
+                                    <Setter TargetName="indicator" Property="Fill" Value="{DynamicResource ButtonPrimaryBackground}" />
+                                    <Setter TargetName="indicator" Property="Width" Value="6" />
+                                    <Setter TargetName="root" Property="RenderTransform">
+                                        <Setter.Value>
+                                            <ScaleTransform ScaleX="1.02" ScaleY="1.02" />
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!--  Стиль DataGrid (покращення зовнішнього вигляду)  -->
             <Style TargetType="DataGrid">
-                <Setter Property="Foreground" Value="{DynamicResource TableTextColor}" />
+                <Setter Property="RowBackground" Value="#111119" />
+                <Setter Property="AlternatingRowBackground" Value="#0E0E16" />
+                <Setter Property="GridLinesVisibility" Value="None" />
+                <Setter Property="HorizontalGridLinesBrush" Value="#20202A" />
+                <Setter Property="VerticalGridLinesBrush" Value="#20202A" />
+                <Setter Property="RowStyle">
+                    <Setter.Value>
+                        <Style TargetType="DataGridRow">
+                            <Setter Property="Background" Value="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver, Converter={x:Null}}" />
+                            <Setter Property="Margin" Value="0" />
+                            <Setter Property="IsTabStop" Value="False" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="DataGridRow">
+                                        <Border
+                                            x:Name="DGR_Border"
+                                            Background="{TemplateBinding Background}"
+                                            SnapsToDevicePixels="True">
+                                            <DataGridCellsPresenter />
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="DGR_Border" Property="Background" Value="#222235" />
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="DGR_Border" Property="Background" Value="#283044" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Setter.Value>
+                </Setter>
             </Style>
 
-            <Style TargetType="DataGridRow">
-                <Setter Property="Foreground" Value="{DynamicResource TableTextColor}" />
-            </Style>
+            <!--  Індикатор завантаження (простий спінер)  -->
+            <ControlTemplate x:Key="LoadingSpinnerTemplate" TargetType="ContentControl">
+                <Grid Width="36" Height="36">
+                    <Ellipse
+                        Width="10"
+                        Height="10"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Fill="#999"
+                        Opacity="0.9"
+                        RenderTransformOrigin="0.5,0.5">
+                        <Ellipse.RenderTransform>
+                            <TranslateTransform x:Name="t1" />
+                        </Ellipse.RenderTransform>
+                        <Ellipse.Triggers>
+                            <EventTrigger RoutedEvent="Loaded">
+                                <BeginStoryboard>
+                                    <Storyboard RepeatBehavior="Forever">
+                                        <DoubleAnimation
+                                            AutoReverse="True"
+                                            Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                                            From="0"
+                                            To="26"
+                                            Duration="0:0:0.8" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Ellipse.Triggers>
+                    </Ellipse>
+                </Grid>
+            </ControlTemplate>
 
-            <Style TargetType="DataGridCell">
-                <Setter Property="Foreground" Value="{DynamicResource TableTextColor}" />
-                <Setter Property="BorderThickness" Value="0" />
-            </Style>
-
-            <Style TargetType="DataGridColumnHeader">
-                <Setter Property="Foreground" Value="{DynamicResource TableTextColor}" />
+            <!--  Повторно використовуваний спінер як стиль ContentControl  -->
+            <Style x:Key="Spinner" TargetType="ContentControl">
+                <Setter Property="Template" Value="{StaticResource LoadingSpinnerTemplate}" />
             </Style>
 
         </ResourceDictionary>

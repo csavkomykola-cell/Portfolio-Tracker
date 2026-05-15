@@ -12,54 +12,67 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="300" />
+            <ColumnDefinition Width="260" MinWidth="180" />
+            <ColumnDefinition Width="5" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="0" Background="{DynamicResource CardBackground}">
-            <StackPanel Margin="10">
-
+        <!--  Бічна панель  -->
+        <Border Grid.Column="0" Style="{StaticResource CardStyle}">
+            <DockPanel>
                 <TextBlock
                     Margin="10"
+                    DockPanel.Dock="Top"
                     FontSize="30"
                     FontWeight="Bold"
                     Foreground="{DynamicResource TextColor}"
                     Text="{DynamicResource Title}" />
-
-                <Separator Margin="5" />
-
-                <Button
-                    Click="Dashboard_Click"
-                    Content="{DynamicResource Dashboard}"
-                    FontSize="20"
-                    Style="{StaticResource SidebarButton}" />
-                <Button
-                    Click="Portfolio_Click"
-                    Content="{DynamicResource Portfolio}"
-                    FontSize="20"
-                    Style="{StaticResource SidebarButton}" />
-                <Button
-                    Click="Transactions_Click"
-                    Content="{DynamicResource Transactions}"
-                    FontSize="20"
-                    Style="{StaticResource SidebarButton}" />
-                <Button
-                    Click="Assets_Click"
-                    Content="{DynamicResource Assets}"
-                    FontSize="20"
-                    Style="{StaticResource SidebarButton}" />
-                <Button
-                    Click="Settings_Click"
-                    Content="{DynamicResource Settings}"
-                    FontSize="20"
-                    Style="{StaticResource SidebarButton}" />
-
-            </StackPanel>
+                <Separator Margin="5" DockPanel.Dock="Top" />
+                <StackPanel Margin="8" DockPanel.Dock="Top">
+                    <ToggleButton
+                        x:Name="BtnDashboard"
+                        Click="Dashboard_Click"
+                        Content="{DynamicResource Dashboard}"
+                        Style="{StaticResource SidebarToggleButtonStyle}" />
+                    <ToggleButton
+                        x:Name="BtnPortfolio"
+                        Click="Portfolio_Click"
+                        Content="{DynamicResource Portfolio}"
+                        Style="{StaticResource SidebarToggleButtonStyle}" />
+                    <ToggleButton
+                        x:Name="BtnTransactions"
+                        Click="Transactions_Click"
+                        Content="{DynamicResource Transactions}"
+                        Style="{StaticResource SidebarToggleButtonStyle}" />
+                    <ToggleButton
+                        x:Name="BtnAssets"
+                        Click="Assets_Click"
+                        Content="{DynamicResource Assets}"
+                        Style="{StaticResource SidebarToggleButtonStyle}" />
+                    <ToggleButton
+                        x:Name="BtnSettings"
+                        Click="Settings_Click"
+                        Content="{DynamicResource Settings}"
+                        Style="{StaticResource SidebarToggleButtonStyle}" />
+                </StackPanel>
+            </DockPanel>
         </Border>
 
-        <Grid Grid.Column="1">
-            <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden" />
-        </Grid>
-    </Grid>
+        <!--  Роздільник  -->
+        <GridSplitter
+            Grid.Column="1"
+            Width="5"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Background="Transparent"
+            ShowsPreview="True" />
 
+        <!--  Область вмісту  -->
+        <Border
+            Grid.Column="2"
+            Padding="12"
+            Background="Transparent">
+            <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden" />
+        </Border>
+    </Grid>
 </Window>
