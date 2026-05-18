@@ -37,8 +37,9 @@
                     Text="{DynamicResource MyPortfolio}" />
                 <DataGrid
                     Margin="10"
+                    AlternatingRowBackground="White"
                     AutoGenerateColumns="False"
-                    Background="Transparent"
+                    Background="White"
                     BorderThickness="0"
                     CanUserSortColumns="False"
                     FontSize="15"
@@ -46,12 +47,20 @@
                     GridLinesVisibility="All"
                     IsReadOnly="True"
                     ItemsSource="{Binding PortfolioItems}"
+                    RowBackground="White"
                     RowHeaderWidth="0"
                     SelectionChanged="DataGrid_SelectionChanged">
 
                     <DataGrid.RowStyle>
                         <Style TargetType="DataGridRow">
                             <Setter Property="Foreground" Value="{DynamicResource TableTextColor}" />
+                            <Setter Property="Background" Value="White" />
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
+                                </Trigger>
+                            </Style.Triggers>
                         </Style>
                     </DataGrid.RowStyle>
 
@@ -59,6 +68,13 @@
                         <Style TargetType="DataGridCell">
                             <Setter Property="Foreground" Value="{DynamicResource TableTextColor}" />
                             <Setter Property="BorderThickness" Value="0" />
+                            <Setter Property="Background" Value="White" />
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
+                                </Trigger>
+                            </Style.Triggers>
                         </Style>
                     </DataGrid.CellStyle>
 

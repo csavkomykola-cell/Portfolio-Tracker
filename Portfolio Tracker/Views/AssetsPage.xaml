@@ -21,7 +21,7 @@
             Foreground="{DynamicResource TextColor}"
             Text="{DynamicResource Assets}" />
 
-        <!--  Controls: Add/Edit/Delete + Search/Filter/Sort  -->
+        <!--  Контролі: Додати/Редагувати/Видалити + Пошук/Фільтр/Сортування  -->
         <StackPanel
             Grid.Row="1"
             Margin="0,0,0,15"
@@ -54,29 +54,39 @@
                     Foreground="{DynamicResource ButtonDangerForeground}" />
             </StackPanel>
 
-            <!--  spacer  -->
-            <Grid Width="20" />
+            <!--  Відступ  -->
+            <Grid Width="10" />
 
-            <!--  Search box (PlaceholderText removed for .NET Framework WPF)  -->
-            <TextBox
-                Width="260"
-                Margin="5"
+            <!--  Мітка пошуку  -->
+            <TextBlock
+                Margin="5,0,5,0"
                 VerticalAlignment="Center"
+                Foreground="{DynamicResource TextColor}"
+                Text="Search" />
+            <TextBox
+                Width="140"
+                Margin="0,5,5,5"
+                VerticalAlignment="Center"
+                Background="White"
                 FontSize="14"
                 Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" />
 
-            <!--  Asset type filter  -->
+            <!--  Фільтр за типом активу  -->
             <ComboBox
-                Width="180"
+                Width="70"
+                Height="30"
                 Margin="5"
+                Background="White"
                 FontSize="14"
                 ItemsSource="{Binding AssetTypes}"
                 SelectedItem="{Binding SelectedAssetType, Mode=TwoWay}" />
 
-            <!--  Sort options  -->
+            <!--  Параметри сортування  -->
             <ComboBox
-                Width="150"
+                Width="70"
+                Height="30"
                 Margin="5"
+                Background="White"
                 FontSize="14"
                 ItemsSource="{Binding SortOptions}"
                 SelectedItem="{Binding SelectedSortOption, Mode=TwoWay}" />
@@ -91,8 +101,9 @@
             CornerRadius="8">
             <DataGrid
                 x:Name="AssetsGrid"
+                AlternatingRowBackground="White"
                 AutoGenerateColumns="False"
-                Background="Transparent"
+                Background="White"
                 BorderThickness="0"
                 CanUserAddRows="False"
                 CanUserDeleteRows="True"
@@ -101,12 +112,20 @@
                 Foreground="{DynamicResource TableTextColor}"
                 IsReadOnly="False"
                 ItemsSource="{Binding AssetsView}"
+                RowBackground="White"
                 RowEditEnding="AssetsGrid_RowEditEnding"
                 SelectedItem="{Binding SelectedAsset, Mode=TwoWay}">
 
                 <DataGrid.RowStyle>
                     <Style TargetType="DataGridRow">
                         <Setter Property="Foreground" Value="{DynamicResource TableTextColor}" />
+                        <Setter Property="Background" Value="White" />
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
+                            </Trigger>
+                        </Style.Triggers>
                     </Style>
                 </DataGrid.RowStyle>
 
@@ -114,6 +133,13 @@
                     <Style TargetType="DataGridCell">
                         <Setter Property="Foreground" Value="{DynamicResource TableTextColor}" />
                         <Setter Property="BorderThickness" Value="0" />
+                        <Setter Property="Background" Value="White" />
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
+                            </Trigger>
+                        </Style.Triggers>
                     </Style>
                 </DataGrid.CellStyle>
 

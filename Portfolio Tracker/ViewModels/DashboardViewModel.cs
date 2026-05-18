@@ -1,32 +1,38 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
+using Portfolio_Tracker.Models;
 
 namespace Portfolio_Tracker.ViewModels
 {
-    public class DashboardViewModel
+    public class DashboardViewModel : INotifyPropertyChanged
     {
-        public string TotalValue { get; set; }
-        public string Profit { get; set; }
-        public int AssetCount { get; set; }
+        private readonly PortfolioViewModel _portfolioVm;
 
-        public ObservableCollection<dynamic> Assets { get; set; }
+        public string TotalValue => _portfolioVm?.TotalValue.ToString("N2") + " $" ?? "0.00 $";
+        public string TotalProfitLoss => (_portfolioVm?.TotalProfitLoss >= 0 ? "+" : "") + (_portfolioVm?.TotalProfitLoss.ToString("N2") ?? "0.00") + " $";
+        public int AssetCount => _portfolioVm?.AssetCount ?? 0;
+
+        public ObservableCollection<PortfolioItem> Assets { get; }
 
         public DashboardViewModel()
         {
-            TotalValue = "140,000 $";
-            Profit = "+4,400 $";
-            AssetCount = 4;
-
-            Assets = new ObservableCollection<dynamic>
+            _portfolioVm = new PortfolioViewModel();
+            _portfolioVm.PropertyChanged += (s, e) =>
             {
-                new { Symbol="AAPL", Name="Apple", CurrentPrice=400 },
-                new { Symbol="BTC", Name="Bitcoin", CurrentPrice=40000 },
-                new { Symbol="TSLA", Name="Tesla", CurrentPrice=440 }
+                if (e.PropertyName == nameof(PortfolioViewModel.TotalValue))
+                    OnPropertyChanged(nameof(TotalValue));
+                else if (e.PropertyName == nameof(PortfolioViewModel.TotalProfitLoss))
+                    OnPropertyChanged(nameof(TotalProfitLoss));
+                else if (e.PropertyName == nameof(PortfolioViewModel.AssetCount))
+                    OnPropertyChanged(nameof(AssetCount));
             };
+
+            // Повторно використати колекцію портфеля для відображення списку останніх активів
+            Assets = _portfolioVm.Portfolio;
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }
