@@ -65,52 +65,111 @@ namespace Portfolio_Tracker.Services
                                .Distinct()
                                .ToList() ?? new List<string>();
 
+            if (list.Count == 0) return;
+
+            // split crypto vs others
             var idMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (var s in list)
                 if (_symbolToId.TryGetValue(s, out var id))
                     idMap[s] = id;
 
-            if (idMap.Count == 0) return;
+            var nonCrypto = list.Except(idMap.Keys, StringComparer.OrdinalIgnoreCase).ToList();
 
             IsLoading = true;
             try
             {
-                var ids = string.Join(",", idMap.Values.Distinct());
-                var vsCurrencies = "usd";
-                var url = $"https://api.coingecko.com/api/v3/simple/price?ids={Uri.EscapeDataString(ids)}&vs_currencies={Uri.EscapeDataString(vsCurrencies)}";
+                var prices = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase);
 
-                using (var resp = await _http.GetAsync(url).ConfigureAwait(false))
+                // 1) CoinGecko для відомих ID криптовалют
+                if (idMap.Count > 0)
                 {
-                    resp.EnsureSuccessStatusCode();
-                    using (var stream = await resp.Content.ReadAsStreamAsync().ConfigureAwait(false))
-                    using (var doc = await JsonDocument.ParseAsync(stream).ConfigureAwait(false))
+                    var ids = string.Join(",", idMap.Values.Distinct());
+                    var vsCurrencies = "usd";
+                    var url = $"https://api.coingecko.com/api/v3/simple/price?ids={Uri.EscapeDataString(ids)}&vs_currencies={Uri.EscapeDataString(vsCurrencies)}";
+
+                    using (var resp = await _http.GetAsync(url).ConfigureAwait(false))
                     {
-                        var root = doc.RootElement;
-                        var prices = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase);
-
-                        foreach (var kv in idMap)
+                        resp.EnsureSuccessStatusCode();
+                        using (var stream = await resp.Content.ReadAsStreamAsync().ConfigureAwait(false))
+                        using (var doc = await JsonDocument.ParseAsync(stream).ConfigureAwait(false))
                         {
-                            var symbol = kv.Key;
-                            var id = kv.Value;
-
-                            if (root.TryGetProperty(id, out var coinEl))
+                            var root = doc.RootElement;
+                            foreach (var kv in idMap)
                             {
-                                if (coinEl.TryGetProperty("usd", out var usdEl))
+                                var symbol = kv.Key;
+                                var id = kv.Value;
+                                if (root.TryGetProperty(id, out var coinEl) && coinEl.TryGetProperty("usd", out var usdEl))
                                 {
-                                    if (usdEl.TryGetDecimal(out var d))
+                                    if (usdEl.ValueKind == JsonValueKind.Number && usdEl.TryGetDecimal(out var d))
                                         prices[symbol] = d;
                                     else if (usdEl.ValueKind == JsonValueKind.Number && usdEl.TryGetDouble(out var dd))
                                         prices[symbol] = (decimal)dd;
                                 }
                             }
                         }
-
-                        // Виклик у UI-потоці, щоб споживачі могли безпосередньо оновлювати прив'язані моделі
-                        Application.Current?.Dispatcher?.BeginInvoke(new Action(() =>
-                        {
-                            PricesUpdated?.Invoke(prices);
-                        }));
                     }
+                }
+
+                // 2) Yahoo Finance як резервний варіант для акцій / інших тікерів (без API-ключа)
+                if (nonCrypto.Count > 0)
+                {
+                    // Yahoo дозволяє кілька символів, розділених комами
+                    var chunkSize = 10; // уникати занадто довгих URL
+                    for (int i = 0; i < nonCrypto.Count; i += chunkSize)
+                    {
+                        var chunk = nonCrypto.Skip(i).Take(chunkSize);
+                        var q = string.Join(",", chunk);
+                        var url = $"https://query1.finance.yahoo.com/v7/finance/quote?symbols={Uri.EscapeDataString(q)}";
+
+                        try
+                        {
+                            using (var resp = await _http.GetAsync(url).ConfigureAwait(false))
+                            {
+                                resp.EnsureSuccessStatusCode();
+                                using (var stream = await resp.Content.ReadAsStreamAsync().ConfigureAwait(false))
+                                using (var doc = await JsonDocument.ParseAsync(stream).ConfigureAwait(false))
+                                {
+                                    if (doc.RootElement.TryGetProperty("quoteResponse", out var qr) &&
+                                        qr.TryGetProperty("result", out var arr) &&
+                                        arr.ValueKind == JsonValueKind.Array)
+                                    {
+                                        foreach (var el in arr.EnumerateArray())
+                                        {
+                                            if (el.TryGetProperty("symbol", out var symEl) && symEl.ValueKind == JsonValueKind.String &&
+                                                el.TryGetProperty("regularMarketPrice", out var priceEl) &&
+                                                (priceEl.ValueKind == JsonValueKind.Number || priceEl.ValueKind == JsonValueKind.String))
+                                            {
+                                                var sym = symEl.GetString().ToUpperInvariant();
+                                                if (priceEl.TryGetDecimal(out var pd))
+                                                    prices[sym] = pd;
+                                                else if (priceEl.TryGetDouble(out var pdbl))
+                                                    prices[sym] = (decimal)pdbl;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        catch
+                        {
+                            // ігнорувати помилки для кожного блоку та продовжувати; помилки будуть повідомлені нижче, якщо нічого не вдасться отримати
+                        }
+                    }
+                }
+
+                // Викликати на UI-потоку з об'єднаними результатами (тільки якщо є щось)
+                if (prices.Count > 0)
+                {
+                    Application.Current?.Dispatcher?.BeginInvoke(new Action(() =>
+                    {
+                        PricesUpdated?.Invoke(prices);
+                    }));
+                }
+                else
+                {
+                    // нічого не знайдено -> відобразити легке виключення, щоб дозволити UI логувати/показувати
+                    Application.Current?.Dispatcher?.BeginInvoke(new Action(() =>
+                        PricesUpdateFailed?.Invoke(new Exception("No prices returned from providers."))));
                 }
             }
             catch (Exception ex)

@@ -50,10 +50,23 @@
                         Content="{DynamicResource Assets}"
                         Style="{StaticResource SidebarToggleButtonStyle}" />
                     <ToggleButton
+                        x:Name="BtnCryptoMarket"
+                        Click="CryptoMarket_Click"
+                        Content="Crypto Market"
+                        Style="{StaticResource SidebarToggleButtonStyle}" />
+                    <ToggleButton
                         x:Name="BtnSettings"
                         Click="Settings_Click"
                         Content="{DynamicResource Settings}"
                         Style="{StaticResource SidebarToggleButtonStyle}" />
+
+                    <Separator Margin="6" />
+
+                    <Button
+                        x:Name="BtnExit"
+                        Click="Exit_Click"
+                        Content="{DynamicResource Exit}"
+                        Style="{StaticResource AccentButton}" />
                 </StackPanel>
             </DockPanel>
         </Border>

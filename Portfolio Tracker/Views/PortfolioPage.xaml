@@ -28,15 +28,22 @@
             BorderThickness="1"
             CornerRadius="8"
             SnapsToDevicePixels="True">
-            <StackPanel>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
 
                 <TextBlock
+                    Grid.Row="0"
                     Margin="0,0,0,8"
                     FontSize="20"
                     Foreground="{DynamicResource TextColor}"
                     Text="{DynamicResource MyPortfolio}" />
+
                 <DataGrid
-                    Margin="10"
+                    Grid.Row="1"
+                    Margin="0"
                     AlternatingRowBackground="White"
                     AutoGenerateColumns="False"
                     Background="White"
@@ -46,7 +53,7 @@
                     Foreground="{DynamicResource TableTextColor}"
                     GridLinesVisibility="All"
                     IsReadOnly="True"
-                    ItemsSource="{Binding PortfolioItems}"
+                    ItemsSource="{Binding Portfolio}"
                     RowBackground="White"
                     RowHeaderWidth="0"
                     SelectionChanged="DataGrid_SelectionChanged">
@@ -110,7 +117,7 @@
                     </DataGrid.Columns>
 
                 </DataGrid>
-            </StackPanel>
+            </Grid>
         </Border>
 
     </Grid>

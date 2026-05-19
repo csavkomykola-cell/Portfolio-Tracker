@@ -1,6 +1,8 @@
 ﻿using Portfolio_Tracker.Services;
 using Portfolio_Tracker.Views;
+using Portfolio_Tracker.Models;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media.Animation;
 
 namespace Portfolio_Tracker.Views
@@ -10,6 +12,7 @@ namespace Portfolio_Tracker.Views
         public LoginWindow()
         {
             InitializeComponent();
+            this.PreviewKeyDown += Window_PreviewKeyDown;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -26,7 +29,7 @@ namespace Portfolio_Tracker.Views
             var (ok, message, user) = AuthService.Login(username, password);
             if (ok)
             {
-                var main = new MainWindow();
+                var main = new MainWindow(user);
                 main.Show();
                 this.Close();
             }
@@ -46,9 +49,25 @@ namespace Portfolio_Tracker.Views
         private void GuestButton_Click(object sender, RoutedEventArgs e)
         {
             var guest = AuthService.Guest();
-            var main = new MainWindow();
+            var main = new MainWindow(guest);
             main.Show();
             this.Close();
+        }
+
+        // Quick "cheat" — only when focus is NOT inside TextBox/PasswordBox
+        private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.C)
+            {
+                var focused = FocusManager.GetFocusedElement(this);
+                if (focused is System.Windows.Controls.TextBox || focused is System.Windows.Controls.PasswordBox)
+                    return;
+
+                var guest = AuthService.Guest();
+                var main = new MainWindow(guest);
+                main.Show();
+                this.Close();
+            }
         }
     }
 }

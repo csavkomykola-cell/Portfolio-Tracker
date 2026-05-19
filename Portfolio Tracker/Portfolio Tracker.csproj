@@ -131,6 +131,7 @@
     <Compile Include="Services\JsonService.cs" />
     <Compile Include="Services\PriceService.cs" />
     <Compile Include="ViewModels\AssetsViewModel.cs" />
+    <Compile Include="ViewModels\CryptoMarketViewModel.cs" />
     <Compile Include="ViewModels\PortfolioViewModel.cs" />
     <Compile Include="ViewModels\DashboardViewModel.cs" />
     <Compile Include="ViewModels\TransactionsViewModel.cs" />
@@ -139,6 +140,9 @@
     </Compile>
     <Compile Include="Views\AssetsPage.xaml.cs">
       <DependentUpon>AssetsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\CryptoMarketPage.xaml.cs">
+      <DependentUpon>CryptoMarketPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\EditAssetWindow.xaml.cs">
       <DependentUpon>EditAssetWindow.xaml</DependentUpon>
@@ -171,6 +175,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\AssetsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\CryptoMarketPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
